@@ -1,6 +1,8 @@
-import subprocess
+import subprocess, time
 
-class MorseCharacter(object):
+speed = 50
+
+class Morse(object):
     morsechars  = {
                       "0": "-----",
                       "1": ".----",
@@ -49,11 +51,37 @@ class MorseCharacter(object):
                       ")": "-.--.-"
                     }
 
-    def __init__(self, char):
-        self.char = char
-    def morseChar(self):
-        return MorseCharacter.morsechars[]
+    def __init__(self, string):
+        self.string = string
+        self.chars = list(self.string)
+        self.morse_chars = Morse.MorseChar(self.chars)
 
+    def MorseChar(self):
+        morse_chars = []
+        for i in self:
+            morse_chars.append(Morse.morsechars[i])
+        return morse_chars
+    def PlayMorse(self):
+        for i in self.morse_chars:
+            for a in list(i):
+                if a == '.':
+                    pulse_length = 1 / speed
+                elif a == '-':
+                    pulse_length = 3 / speed
+                else:
+                    raise Exception('Fatal: not a morse character.')
+                sound(1000, pulse_length, 128000)
+                time.sleep(5 / speed)
+                print('moi')
+# class MorseString(MorseCharacter):
+#     def __init__(self, string):
+#         self.string = string
+#     def PlayString(self):
+#         for i in self.string:
+#             morse = MorseCharacter(i)
+#             print(morse.morsechar)
+#             morse.PlayMorse
+#             time.sleep(7 / speed)
 
 def sound(frequency, length, bitrate):
     python3_command = "python2 sound.py {} {} {}".format(frequency, length, bitrate)  # launch your python2 script using bash
@@ -62,5 +90,7 @@ def sound(frequency, length, bitrate):
     output, error = process.communicate()  # receive output from the python2 script
     if output != None or error != None:
         return output, error
-chartest = MorseCharacter('a')
-print(chartest.morseChar())
+
+user_input = input('string: ')
+chartest = Morse(user_input)
+chartest.PlayMorse()

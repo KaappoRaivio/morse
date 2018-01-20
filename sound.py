@@ -5,7 +5,7 @@ import sys
 PyAudio = pyaudio.PyAudio
 
 frequency = int(sys.argv[1]) * 2
-length = int(sys.argv[2])
+length = float(sys.argv[2])
 bitrate = int(sys.argv[3])
 if 2 * frequency > bitrate:
     bitrate = frequency+100
