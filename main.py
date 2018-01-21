@@ -1,6 +1,6 @@
 import subprocess, time
 
-speed = 50
+speed = 30
 
 class Morse(object):
     morsechars  = {
@@ -73,7 +73,7 @@ class Morse(object):
                     raise Exception('Fatal: not a morse character.')
                 sound(1000, pulse_length, 128000)
                 time.sleep(5 / speed)
-                print('moi')
+            time.sleep(2 / speed)
 
 def sound(frequency, length, bitrate):
     python3_command = 'python2 sound.py {} {} {}'.format(frequency, length, bitrate)  # launch your python2 script using bash
@@ -84,4 +84,5 @@ def sound(frequency, length, bitrate):
 
 user_input = input('string: ').lower()
 chartest = Morse(user_input)
+print(chartest.morse_chars)
 chartest.PlayMorse()
