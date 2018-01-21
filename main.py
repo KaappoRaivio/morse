@@ -1,8 +1,18 @@
-import subprocess, time
+import pyaudio
+import numpy as np
+import time
 
-speed = 30
+speed = 53
 
 class Morse(object):
+    """
+    Desc:
+        A class of which instances contatain a string to be morsed.
+    Methods:
+        None
+    Raises:
+        True
+    """
     morsechars  = {
                       '0': '-----',
                       '1': '.----',
@@ -50,39 +60,74 @@ class Morse(object):
                       '(': '-.--.',
                       ')': '-.--.-'
                     }
-
+    illegal_chars = {
+                        'ä':list('ae'),
+                        'ö':list('oe'),
+                        'å':list('aa'),
+                        ' ':list('space')
+    }
     def __init__(self, string):
-        self.string = string
-        self.chars = list(self.string)
-        self.morse_chars = Morse.MorseChar(self.chars)
+        self.string = string # the string initiation
+        self.chars = list(self.string) # a list version of the above
+        self.morse_chars = Morse.MorseChar(self.chars) # refer to the corresponding function
 
     def MorseChar(self):
+        """
+        Desc:
+            converts a given string into a morse notation.
+        Takes:
+            Morse self
+        Returns:
+            list morse_chars: a list containg the corresponding morse alphabet.
+        Raises:
+            Exception: in case of a KeyError.
+        """
         morse_chars = []
-        for i in self:
-            morse_chars.append(Morse.morsechars[i])
+        for i in range(len(self)):
+            try:
+                morse_chars.append(Morse.morsechars[self[i]])
+            except KeyError:
+                if self[i] in Morse.illegal_chars: #handling the illegal chars
+                    for a in Morse.illegal_chars[self[i]]:
+                        morse_chars.append(Morse.morsechars[a])
+                else:
+                    raise Exception('Error: an unspecified illegal character in stdin')
         return morse_chars
 
     def PlayMorse(self):
         for i in self.morse_chars:
-            for a in list(i):
-                if a == '.':
-                    pulse_length = 1 / speed
+            for a in list(i): #Words
+                if a == '.': # Individual characters
+                    pulse_length = 1 / speed # a 1-unit-long pulse (dot)
                 elif a == '-':
-                    pulse_length = 3 / speed
+                    pulse_length = 3 / speed # a 3-units-long pulse (dash)
                 else:
                     raise Exception('Fatal: not a morse character.')
-                sound(1000, pulse_length, 128000)
-                time.sleep(5 / speed)
-            time.sleep(2 / speed)
+                sound(pulse_length)
+                time.sleep(5 / speed) # a 5-units-long sleep between characters
+            time.sleep(2 / speed) # a 2-units-long sleep because the above sleep cycle is executed too. (7 combined)
 
-def sound(frequency, length, bitrate):
-    python3_command = 'python2 sound.py {} {} {}'.format(frequency, length, bitrate)  # launch your python2 script using bash
-    process = subprocess.Popen(python3_command.split(), stdout=subprocess.PIPE)
-    output, error = process.communicate()  # receive output from the python2 script
-    if output != None or error != None:
-        return output, error
+p = pyaudio.PyAudio() #initiate the PyAudio
+stream = p.open(format=pyaudio.paFloat32, #open the stream
+channels=1,
+rate=44100,
+output=True)
+def sound(length, volume=1, frequency=440):       # sampling rate, Hz, must be integer
+    global stream
+    length *= 10
+    fs = 44100
+    samples = (np.sin(2 * np.pi * np.arange(fs * length) * frequency / fs)).astype(np.float32)
+    stream.write(volume*samples)
+    return None
+
 
 user_input = input('string: ').lower()
 chartest = Morse(user_input)
 print(chartest.morse_chars)
 chartest.PlayMorse()
+
+
+stream.stop_stream()
+stream.close()
+
+p.terminate() #terminate everything
