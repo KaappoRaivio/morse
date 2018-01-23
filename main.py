@@ -98,14 +98,16 @@ class Morse(object):
     def PlayMorse(self):
         for i in range(len(self.morse_chars)): #Letters
             if self.morse_chars[i] == ' ':
-                time.sleep(6 / speed)
+                time.sleep(4 / speed)
             else:
-                time.sleep(2 / speed)
+                time.sleep(0 / speed)
             for a in list(self.morse_chars[i]):
                 if a == '.': # Individual characters
                     pulse_length = 1 / speed # a 1-unit-long pulse (dot)
                 elif a == '-':
                     pulse_length = 3 / speed # a 3-units-long pulse (dash)
+                elif a == ' ':
+                    continue
                 else:
                     raise Exception('Fatal: not a morse character.')
                 sound(pulse_length)
@@ -116,7 +118,7 @@ stream = p.open(format=pyaudio.paFloat32, #open the stream
 channels=1,
 rate=44100,
 output=True)
-def sound(length, volume=1, frequency=440):       # sampling rate, Hz, must be integer
+def sound(length, volume=1, frequency=700):       # sampling rate, Hz, must be integer
     global stream
     length *= 10
     fs = 44100
