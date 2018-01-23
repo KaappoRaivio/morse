@@ -3,7 +3,7 @@ import pyaudio
 import numpy as np
 import time
 
-speed = 53
+speed = 20
 
 class Morse(object):
     """
@@ -59,13 +59,13 @@ class Morse(object):
                       '/': '-..-.',
                       '@': '.--.-.',
                       '(': '-.--.',
-                      ')': '-.--.-'
+                      ')': '-.--.-',
+                      ' ': ' '
                     }
     illegal_chars = {
                         'ä':list('ae'),
                         'ö':list('oe'),
                         'å':list('aa'),
-                        ' ':list('space')
     }
     def __init__(self, string):
         self.string = string # the string initiation
@@ -96,8 +96,12 @@ class Morse(object):
         return morse_chars
 
     def PlayMorse(self):
-        for i in self.morse_chars:
-            for a in list(i): #Words
+        for i in range(len(self.morse_chars)): #Letters
+            if self.morse_chars[i] == ' ':
+                time.sleep(6 / speed)
+            else:
+                time.sleep(2 / speed)
+            for a in list(self.morse_chars[i]):
                 if a == '.': # Individual characters
                     pulse_length = 1 / speed # a 1-unit-long pulse (dot)
                 elif a == '-':
@@ -105,8 +109,7 @@ class Morse(object):
                 else:
                     raise Exception('Fatal: not a morse character.')
                 sound(pulse_length)
-                time.sleep(5 / speed) # a 5-units-long sleep between characters
-            time.sleep(2 / speed) # a 2-units-long sleep because the above sleep cycle is executed too. (7 combined)
+                time.sleep(3 / speed) # a 5-units-long sleep between characters
 
 p = pyaudio.PyAudio() #initiate the PyAudio
 stream = p.open(format=pyaudio.paFloat32, #open the stream
